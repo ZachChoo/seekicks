@@ -16,15 +16,15 @@ If we need more images in the dataset, we have to find a way to scrape more imag
 We are struggling to train on the 8GB dataset (size is partially due to images being high definition) efficiently using Google Colab so we are planning to make a shrunken dataset of a handful of shoes to do most of the basic model debugging and testing, then moving to the large dataset when we are close to a final model.
 
 **Tasks done:**
-Allen:
-* Did preliminary research on the ML model and app development
-* Worked with Marc on the basic ML model on Google Colab 
-* Mounted a Kaggle dataset using the Kaggle API. 
-Janishjit:
+1. Allen:
+	* Did preliminary research on the ML model and app development
+	* Worked with Marc on the basic ML model on Google Colab 
+	* Mounted a Kaggle dataset using the Kaggle API. 
+2. Janishjit:
 	Created a basic mobile application using Flutter UI. The application functions as a basic camera which clicks and stores images.
-Marc:
+3. Marc:
 	Familiarized with the project and our goals.  Worked with Allen to create the basic model skeleton and mount the dataset effectively.
-Zachary:
+4. Zachary:
 	Worked on writing the code to run the model, like replacing the fc layer and making the test, train, etc. functions
 
 **Resources:**
