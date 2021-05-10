@@ -39,12 +39,12 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-assets:
-  assets/models/model.pt
-  assets/labels.csv
+
 # The following section is specific to Flutter.
 flutter:
-
+  assets:
+    - assets/models/entire_model_epoch11.pt
+    - assets/labels/labels.csv
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

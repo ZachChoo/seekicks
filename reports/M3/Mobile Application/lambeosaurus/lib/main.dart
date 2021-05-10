@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pytorch_mobile/pytorch_mobile.dart';
+import 'package:pytorch_mobile/model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +41,7 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
-
+  String prediction = "No sneaker found";
 
   @override
   void initState() {
@@ -67,7 +68,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Model _imageModel = await PytorchMobile.loadModel('assets/models/custom_model.pt');
     return Scaffold(
       appBar: AppBar(title: Text('TEAM LAMBEOSAURUS',
         style: GoogleFonts.raleway(
@@ -80,50 +80,71 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       // Wait until the controller is initialized before displaying the
       // camera preview. Use a FutureBuilder to display a loading spinner
       // until the controller has finished initializing.
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the Future is complete, display the preview.
-            return CameraPreview(_controller);
-          } else {
-            // Otherwise, display a loading indicator.
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.camera_alt_rounded),
-        backgroundColor: Colors.white,
-        // Provide an onPressed callback.
-        onPressed: () async {
-          // Take the Picture in a try / catch block. If anything goes wrong,
-          // catch the error.
-          try {
-            // Ensure that the camera is initialized.
-            await _initializeControllerFuture;
-
-            // Attempt to take a picture and get the file `image`
-            // where it was saved.
-            final image = await _controller.takePicture();
-
-            String prediction = await _imageModel.getImagePrediction(image, 224, 224, "assets/labels/labels.csv");
-            // If the picture was taken, display it on a new screen.
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image?.path,
-                ),
+      body: ListView(
+        children: [
+          Container(
+            child: FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // If the Future is complete, display the preview.
+                  return CameraPreview(_controller);
+                } else {
+                  // Otherwise, display a loading indicator.
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+          Container(
+            height: 30,
+            child: Text(
+              prediction,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black
               ),
-            );
-          } catch (e) {
-            // If an error occurs, log the error to the console.
-            print(e);
-          }
-        },
+            ),
+          ),
+          Container(
+            child: FloatingActionButton(
+              child: Icon(Icons.camera_alt_rounded),
+              backgroundColor: Colors.white,
+              // Provide an onPressed callback.
+              onPressed: () async {
+                Model imageModel = await PyTorchMobile.loadModel('assets/models/entire_model_epoch11.pt');
+                // Take the Picture in a try / catch block. If anything goes wrong,
+                // catch the error.
+                try {
+                  // Ensure that the camera is initialized.
+                  await _initializeControllerFuture;
+
+                  // Attempt to take a picture and get the file `image`
+                  // where it was saved.
+                  final image = await _controller.takePicture();
+                  File file = File(image.path);
+                  prediction = await imageModel.getImagePrediction(file, 224, 224, "assets/labels/labels.csv");
+                  // If the picture was taken, display it on a new screen.
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DisplayPictureScreen(
+                        // Pass the automatically generated path to
+                        // the DisplayPictureScreen widget.
+                        imagePath: image?.path,
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  // If an error occurs, log the error to the console.
+                  print(e);
+                }
+              },
+            ),
+          )
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
