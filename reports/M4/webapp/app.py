@@ -30,6 +30,7 @@ file_up = st.file_uploader("", type=["jpg", "png", "jpeg", "jfif", "webp"])
 if file_up is not None:
     #transform image to tensor
     image = Image.open(file_up)
+    image = image.convert("RGB")
     xform = transforms.Compose([transforms.Resize((224,224)), transforms.ToTensor()])
     img_tensor = torch.unsqueeze(xform(image), 0)
 
