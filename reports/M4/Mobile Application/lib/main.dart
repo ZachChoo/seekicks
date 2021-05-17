@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
 
   //load your model
   Future loadModel() async {
-    String pathImageModel = "assets/models/train_jit_model.pt";
+    String pathImageModel = "assets/models/final_jit_model.pt";
     try {
       _imageModel = await PyTorchMobile.loadModel(pathImageModel);
     } on PlatformException {
@@ -41,10 +41,9 @@ class _MyAppState extends State<MyApp> {
   //run an image model
   Future runImageModel() async {
     File image = await ImagePicker.pickImage(
-        source: /*(Platform.isIOS ?*/ ImageSource.gallery /*: ImageSource.camera)*/,
+        source: (Platform.isIOS ? ImageSource.gallery : ImageSource.camera),
         maxHeight: 224,
         maxWidth: 224);
-    // _imagePrediction = await _imageModel.getImagePredictionList(image, 224, 224);
     _imagePrediction = await _imageModel.getImagePrediction(image, 224, 224, "assets/labels/labels_with_hyphen_only.csv");
     _url = await _imageModel.getImagePrediction(image, 224, 224, "assets/labels/labels_with_links_only.csv");
 
@@ -76,7 +75,7 @@ class _MyAppState extends State<MyApp> {
             Center(
               child: Visibility(
                 visible: _imagePrediction != null,
-                child: Text("$_imagePrediction"),
+                child: Text(_imagePrediction),
               ),
             ),
             Center(
